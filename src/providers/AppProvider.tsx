@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { buildbear } from "../providers/config";
 import { config } from "../providers/config";
+import { sepolia } from "viem/chains";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +23,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           },
         },
         defaultChain: buildbear,
-        supportedChains: [buildbear],
+        supportedChains: [buildbear, sepolia],
       }}
     >
       <QueryClientProvider client={queryClient}>

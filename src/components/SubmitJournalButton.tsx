@@ -21,7 +21,7 @@ function SubmitJournalButton({ plaintext }: Props) {
 
       const encryptedData = await handleEncrypt(signTypedData, plaintext);
 
-      if (!encryptedData) {
+      if (!encryptedData.cipher || !encryptedData.iv) {
         throw new Error("Encryption failed");
       }
 

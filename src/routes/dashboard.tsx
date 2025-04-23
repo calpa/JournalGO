@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { usePrivy } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { EmotionForm } from "../components/EmotionForm";
 import { Link, Navigate } from "@tanstack/react-router";
 import { Navbar } from "../components/Navbar";
-import { useChainId } from "wagmi";
+import { useChainId, useBalance } from "wagmi";
+import { sepolia } from "viem/chains";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -12,6 +13,10 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const { user } = usePrivy();
   const chainId = useChainId();
+  const { wallets } = useWallets();
+  const { data: balance } = useBalance({
+    address: user?.wallet?.address as `0x${string}`,
+  });
 
   if (!user?.wallet?.address) {
     return <Navigate to="/" />;
@@ -35,6 +40,9 @@ function Dashboard() {
                 {user?.wallet?.address}
               </span>
             </p>
+            <p className="mb-4">
+              餘額: {balance?.formatted} {balance?.symbol}
+            </p>
             <p className="mb-4 break-all">
               合約地址：{import.meta.env.VITE_CONTRACT_ADDRESS}
             </p>
@@ -51,6 +59,16 @@ function Dashboard() {
                 </a>
               </p>
             </div>
+
+            <button
+              onClick={async () => {
+                await wallets[0].switchChain(sepolia.id);
+              }}
+              className="block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-medium mb-4"
+            >
+              切換到 Sepolia
+            </button>
+
             <Link
               to="/entry"
               className="block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-medium"
