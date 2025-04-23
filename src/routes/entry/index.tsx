@@ -13,7 +13,7 @@ function EntryList() {
   const { user } = usePrivy();
   const { data: entryCount, isLoading } = useReadContract({
     abi: JournalGOABI.abi,
-    address: import.meta.env.VITE_CONTRACT_ADDRESS,
+    address: import.meta.env.VITE_OPTIMISM_SEPOLIA_CONTRACT_ADDRESS,
     functionName: "getEntryCount",
     args: [user?.wallet?.address],
     query: {

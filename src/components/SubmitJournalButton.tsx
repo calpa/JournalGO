@@ -3,6 +3,10 @@ import { abi } from "../abi/JournalGO.json";
 import { useState } from "react";
 import { encodeFunctionData } from "viem";
 import { handleEncrypt } from "../functions/handleEncrypt";
+import { useChainId } from "wagmi";
+import { optimismSepolia } from "viem/chains";
+import { usePrivy } from "@privy-io/react-auth";
+import { Address } from "viem";
 
 interface Props {
   plaintext: string;
@@ -13,13 +17,25 @@ function SubmitJournalButton({ plaintext }: Props) {
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { signTypedData } = useSignTypedData();
+  const { user } = usePrivy();
+  const chainId = useChainId();
 
   const handleSubmit = async () => {
     try {
       setIsPending(true);
       setErrorMessage("");
 
-      const encryptedData = await handleEncrypt(signTypedData, plaintext);
+      const address = user?.wallet?.address as Address | null;
+      if (!address) {
+        return;
+      }
+
+      const encryptedData = await handleEncrypt(
+        signTypedData,
+        address,
+        Math.floor(Date.now() / 1000),
+        plaintext
+      );
 
       if (!encryptedData.cipher || !encryptedData.iv) {
         throw new Error("Encryption failed");
@@ -31,14 +47,19 @@ function SubmitJournalButton({ plaintext }: Props) {
       const data = encodeFunctionData({
         abi,
         functionName: "recordEntry",
-        args: [encryptedData.cipher, encryptedData.iv],
+        args: [encryptedData.cipher, encryptedData.iv, encryptedData.timestamp],
       });
 
       console.log("Transaction data:", data);
 
+      const contract_address =
+        chainId === optimismSepolia.id
+          ? import.meta.env.VITE_OPTIMISM_SEPOLIA_CONTRACT_ADDRESS
+          : import.meta.env.VITE_BUILDBEAR_CONTRACT_ADDRESS;
+
       // 5. Send to blockchain
       await sendTransaction({
-        to: import.meta.env.VITE_CONTRACT_ADDRESS,
+        to: contract_address,
         data,
       });
     } catch (err) {

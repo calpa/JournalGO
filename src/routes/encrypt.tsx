@@ -1,25 +1,42 @@
+// src/routes/encrypt.tsx
+
 import { createFileRoute } from "@tanstack/react-router";
 import { useSignTypedData } from "@privy-io/react-auth";
 import { useState } from "react";
 import { handleEncrypt } from "../functions/handleEncrypt";
 import { Navbar } from "../components/Navbar";
 import SubmitEntryButton from "../components/SubmitJournalButton";
+import { usePrivy } from "@privy-io/react-auth";
+import { Address } from "viem";
 
 export const Route = createFileRoute("/encrypt")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { user } = usePrivy();
+
   const { signTypedData } = useSignTypedData();
   const [plaintext, setPlaintext] = useState<string>("");
   const [cipher, setCipher] = useState<string | null>(null);
   const [iv, setIv] = useState<string | null>(null);
+  const [timestamp, setTimestamp] = useState<number>(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const { cipher, iv } = await handleEncrypt(signTypedData, plaintext);
+    const address = user?.wallet?.address as Address | null;
+    if (!address) {
+      return;
+    }
+    const { cipher, iv, timestamp } = await handleEncrypt(
+      signTypedData,
+      address,
+      Date.now(),
+      plaintext
+    );
     setCipher(cipher);
     setIv(iv);
+    setTimestamp(timestamp);
   }
 
   return (
@@ -59,6 +76,10 @@ function RouteComponent() {
             <div className="break-words">
               <div>IV:</div>
               <div>{iv}</div>
+            </div>
+            <div className="break-words">
+              <div>Timestamp:</div>
+              <div>{timestamp}</div>
             </div>
           </div>
         )}

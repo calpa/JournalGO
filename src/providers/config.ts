@@ -1,7 +1,7 @@
 import { createConfig } from "@privy-io/wagmi";
 import { http } from "wagmi";
 import { defineChain } from "viem";
-import { sepolia } from "viem/chains";
+import { optimismSepolia, sepolia } from "viem/chains";
 
 export const buildbear = defineChain({
   id: 25658,
@@ -18,9 +18,10 @@ export const buildbear = defineChain({
 });
 
 export const config = createConfig({
-  chains: [buildbear, sepolia],
+  chains: [buildbear, sepolia, optimismSepolia],
   transports: {
     [buildbear.id]: http(),
     [sepolia.id]: http(),
+    [optimismSepolia.id]: http(),
   },
 });

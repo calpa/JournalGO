@@ -3,7 +3,6 @@ import { useParams } from "@tanstack/react-router";
 import { useReadContract } from "wagmi";
 import JournalGOABI from "../../abi/JournalGO.json";
 import { usePrivy, useSignTypedData } from "@privy-io/react-auth";
-import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { handleDecrypt } from "../../functions/handleDecrypt";
 import { Navbar } from "../../components/Navbar";
@@ -21,7 +20,7 @@ function RouteComponent() {
 
   const { data: entry, isLoading } = useReadContract({
     abi: JournalGOABI.abi,
-    address: import.meta.env.VITE_CONTRACT_ADDRESS,
+    address: import.meta.env.VITE_OPTIMISM_SEPOLIA_CONTRACT_ADDRESS,
     functionName: "getEntry",
     args: [user?.wallet?.address, BigInt(entryId)],
     query: {
@@ -38,9 +37,26 @@ function RouteComponent() {
 
     const cipher = entry[0];
     const iv = entry[1];
+    const timestamp = Number(entry[2]);
+
+    if (!cipher || !iv || !timestamp) {
+      console.error("Invalid entry data");
+      return;
+    }
+
+    if (!user?.wallet?.address) {
+      console.error("User address not found");
+      return;
+    }
 
     try {
-      const text = await handleDecrypt(signTypedData, cipher, iv);
+      const text = await handleDecrypt(
+        signTypedData,
+        user?.wallet?.address,
+        timestamp,
+        cipher,
+        iv
+      );
       setDecryptedText(text);
     } catch (err) {
       console.error("解密失敗", err);
