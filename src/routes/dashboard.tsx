@@ -1,3 +1,4 @@
+import React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { EmotionForm } from "../components/EmotionForm";
@@ -46,10 +47,11 @@ function Dashboard() {
                 {user?.wallet?.address}
               </span>
             </p>
+
+            <p className="mb-4 break-all">合約地址：{contract_address}</p>
             <p className="mb-4">
               餘額: {balance?.formatted} {balance?.symbol}
             </p>
-            <p className="mb-4 break-all">合約地址：{contract_address}</p>
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
               <p className="text-blue-700">
                 獲取免費的測試網絡以太幣：
