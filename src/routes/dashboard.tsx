@@ -87,16 +87,18 @@ function Dashboard() {
         <div>Number of Entries: {entryCount?.toString()}</div>
 
         <div className="mt-4 gap-4 grid grid-cols-3">
-          {Array.from({ length: entryCount?.toString() }).map((_, index) => (
-            <Link
-              key={index}
-              to="/entry/$entryId"
-              params={{ entryId: index.toString() }}
-              className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-medium"
-            >
-              View Entry {index + 1}
-            </Link>
-          ))}
+          {Array.from({ length: Number(entryCount?.toString() || 0) }).map(
+            (_, index) => (
+              <Link
+                key={index}
+                to="/entry/$entryId"
+                params={{ entryId: index.toString() }}
+                className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-medium"
+              >
+                View Entry {index + 1}
+              </Link>
+            )
+          )}
         </div>
 
         {/* Show current blockchain network */}
