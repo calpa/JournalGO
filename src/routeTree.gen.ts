@@ -15,6 +15,7 @@ import { Route as EncryptImport } from './routes/encrypt'
 import { Route as DecryptImport } from './routes/decrypt'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
+import { Route as EntryIndexImport } from './routes/entry/index'
 import { Route as EntryEntryIdImport } from './routes/entry/$entryId'
 
 // Create/Update Routes
@@ -40,6 +41,12 @@ const DashboardRoute = DashboardImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EntryIndexRoute = EntryIndexImport.update({
+  id: '/entry/',
+  path: '/entry/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -88,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntryEntryIdImport
       parentRoute: typeof rootRoute
     }
+    '/entry/': {
+      id: '/entry/'
+      path: '/entry'
+      fullPath: '/entry'
+      preLoaderRoute: typeof EntryIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -99,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/decrypt': typeof DecryptRoute
   '/encrypt': typeof EncryptRoute
   '/entry/$entryId': typeof EntryEntryIdRoute
+  '/entry': typeof EntryIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -107,6 +122,7 @@ export interface FileRoutesByTo {
   '/decrypt': typeof DecryptRoute
   '/encrypt': typeof EncryptRoute
   '/entry/$entryId': typeof EntryEntryIdRoute
+  '/entry': typeof EntryIndexRoute
 }
 
 export interface FileRoutesById {
@@ -116,13 +132,26 @@ export interface FileRoutesById {
   '/decrypt': typeof DecryptRoute
   '/encrypt': typeof EncryptRoute
   '/entry/$entryId': typeof EntryEntryIdRoute
+  '/entry/': typeof EntryIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/decrypt' | '/encrypt' | '/entry/$entryId'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/decrypt'
+    | '/encrypt'
+    | '/entry/$entryId'
+    | '/entry'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/decrypt' | '/encrypt' | '/entry/$entryId'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/decrypt'
+    | '/encrypt'
+    | '/entry/$entryId'
+    | '/entry'
   id:
     | '__root__'
     | '/'
@@ -130,6 +159,7 @@ export interface FileRouteTypes {
     | '/decrypt'
     | '/encrypt'
     | '/entry/$entryId'
+    | '/entry/'
   fileRoutesById: FileRoutesById
 }
 
@@ -139,6 +169,7 @@ export interface RootRouteChildren {
   DecryptRoute: typeof DecryptRoute
   EncryptRoute: typeof EncryptRoute
   EntryEntryIdRoute: typeof EntryEntryIdRoute
+  EntryIndexRoute: typeof EntryIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -147,6 +178,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecryptRoute: DecryptRoute,
   EncryptRoute: EncryptRoute,
   EntryEntryIdRoute: EntryEntryIdRoute,
+  EntryIndexRoute: EntryIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -163,7 +195,8 @@ export const routeTree = rootRoute
         "/dashboard",
         "/decrypt",
         "/encrypt",
-        "/entry/$entryId"
+        "/entry/$entryId",
+        "/entry/"
       ]
     },
     "/": {
@@ -180,6 +213,9 @@ export const routeTree = rootRoute
     },
     "/entry/$entryId": {
       "filePath": "entry/$entryId.tsx"
+    },
+    "/entry/": {
+      "filePath": "entry/index.tsx"
     }
   }
 }

@@ -14,12 +14,10 @@ export const Route = createFileRoute("/entry/$entryId")({
 
 function RouteComponent() {
   const { signTypedData } = useSignTypedData();
-
   const { entryId } = useParams({ from: "/entry/$entryId" });
   const { user } = usePrivy();
 
   const [decryptedText, setDecryptedText] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState("");
 
   const { data: entry, isLoading } = useReadContract({
     abi: JournalGOABI.abi,
@@ -34,7 +32,7 @@ function RouteComponent() {
   async function handleClick(event: React.MouseEvent) {
     event.preventDefault();
     if (!entry) {
-      console.log("No entry found, aborting decryption");
+      console.log("未找到條目，中止解密");
       return;
     }
 
@@ -45,26 +43,21 @@ function RouteComponent() {
       const text = await handleDecrypt(signTypedData, cipher, iv);
       setDecryptedText(text);
     } catch (err) {
-      console.error("Decryption failed", err);
-      setErrorMessage(
-        "Unable to decrypt this journal entry. Please ensure you are the original creator."
-      );
+      console.error("解密失敗", err);
+      setErrorMessage("無法解密此日記條目。請確保您是原始創建者。");
     }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
-      <Navbar title={`Entry ${Number(entryId) + 1}`} />
+      <Navbar title={`條目 ${Number(entryId) + 1}`} />
 
       <main className="container mx-auto px-4 py-8">
         <div className="container bg-white shadow-md rounded-lg p-6">
           <div className="">
-            <h2 className="text-2xl font-bold mb-4">Entry Details</h2>
+            <h2 className="text-2xl font-bold mb-4">您的筆記</h2>
             {Boolean(entry) && (
               <div className="container mt-4 flex flex-col gap-4">
-                <div className="break-words">Cypher: {entry[0]}</div>
-                <div className="break-words">IV: {entry[1]}</div>
-                <div className="break-words">Timestamp: {entry[2]}</div>
                 <div>{decryptedText}</div>
 
                 {!decryptedText && (
@@ -72,9 +65,23 @@ function RouteComponent() {
                     onClick={handleClick}
                     className="mt-4 bg-indigo-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-opacity-90 transition w-36"
                   >
-                    Decrypt
+                    解密
                   </button>
                 )}
+
+                <div className="bg-gray-100 rounded-lg p-4 mt-4">
+                  <h3 className="text-lg font-semibold mb-2">元數據</h3>
+                  <div className="grid grid-cols-1 gap-2">
+                    <div className="break-all">
+                      <span className="font-medium">密文：</span>{" "}
+                      <div>{(entry as [string, string, number])[0]}</div>
+                    </div>
+                    <div className="break-all">
+                      <span className="font-medium">初始化向量：</span>{" "}
+                      <div>{(entry as [string, string, number])[1]}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
