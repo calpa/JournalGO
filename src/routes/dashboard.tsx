@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { usePrivy } from "@privy-io/react-auth";
 import { EmotionForm } from "../components/EmotionForm";
-import { Link } from "@tanstack/react-router";
+import { Link, Navigate } from "@tanstack/react-router";
 import { Navbar } from "../components/Navbar";
-import { Navigate } from "@tanstack/react-router";
+import { useChainId } from "wagmi";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
   const { user } = usePrivy();
+  const chainId = useChainId();
 
   if (!user?.wallet?.address) {
     return <Navigate to="/" />;
@@ -19,15 +20,45 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
       <Navbar title="儀表板" />
-      <main className="container mx-auto px-4 py-4 grid gap-4">
-        <EmotionForm />
-
-        <Link
-          to="/entry"
-          className="inline-block w-36 mx-auto text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-medium"
-        >
-          瀏覽私密筆記
-        </Link>
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-4">情緒日記</h2>
+            <EmotionForm />
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-4">用戶資訊</h2>
+            <div>Chain: {chainId}</div>
+            <p className="mb-4">
+              你的地址是{" "}
+              <span className="font-mono text-sm bg-gray-100 p-1 rounded break-all">
+                {user?.wallet?.address}
+              </span>
+            </p>
+            <p className="mb-4 break-all">
+              合約地址：{import.meta.env.VITE_CONTRACT_ADDRESS}
+            </p>
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+              <p className="text-blue-700">
+                獲取免費的測試網絡以太幣：
+                <a
+                  href="https://faucet.buildbear.io/tense-hulk-76135f78"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  BuildBear Faucet
+                </a>
+              </p>
+            </div>
+            <Link
+              to="/entry"
+              className="block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 font-medium"
+            >
+              瀏覽私密筆記
+            </Link>
+          </div>
+        </div>
       </main>
     </div>
   );
